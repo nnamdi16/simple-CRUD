@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.model.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ public class ProductServiceController {
     //PUT REQUEST - Update a resource.
     @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Object> updateProduct(@PathVariable("id") String id, @RequestBody Product product) {
+        if (!productRepo.containsKey(id)) throw new ProductNotFoundException();
         productRepo.remove(id);
         product.setId(id);
         productRepo.put(id, product);
@@ -52,13 +54,17 @@ public class ProductServiceController {
     //DELETE REQUEST - Delete existing resources. It does not contain request body
     //We can send path variables or Request params
     @RequestMapping(value = "/products/{id}", method = RequestMethod.DELETE)
+
     public ResponseEntity<Object> deleteProduct(@PathVariable("id") String id) {
+        if(!productRepo.containsKey(id)) throw new ProductNotFoundException();
         productRepo.remove(id);
         return new ResponseEntity<>("Product is deleted successfully", HttpStatus.OK);
     }
 
+    //GET REQUEST - GET ONE PRODUCT
     @RequestMapping(value = "/products/{id}")
     public ResponseEntity<Object>getOneProduct(@PathVariable("id") String id) {
+        if (!productRepo.containsKey(id)) throw new ProductNotFoundException();
         return new ResponseEntity<>(productRepo.get(id), HttpStatus.OK);
     }
 
